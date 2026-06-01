@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -7,9 +8,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:system-ui,sans-serif;background:#f4f5f7;min-height:100vh}
-
-/* ── VISTA FICHA ── */
+body{font-family:system-ui,sans-serif;background:var(--color-background-tertiary,#f4f5f7);min-height:100vh}
 #vista-ficha{display:none;max-width:480px;margin:0 auto;padding:0 0 3rem}
 .ficha-header{background:#1a1a2e;color:#fff;padding:1.5rem 1.25rem 1rem}
 .ficha-badge{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#00e5b0;margin-bottom:.5rem;font-weight:600}
@@ -21,43 +20,42 @@ body{font-family:system-ui,sans-serif;background:#f4f5f7;min-height:100vh}
 .ficha-body{padding:1.25rem}
 .section-title{font-size:13px;font-weight:600;color:#1a1a2e;margin-bottom:.75rem;display:flex;align-items:center;gap:6px;text-transform:uppercase;letter-spacing:.06em}
 .section-title::before{content:'';display:inline-block;width:4px;height:14px;background:#00c891;border-radius:2px}
-
 .formato-box{border:2px solid #d0e8d8;border-radius:10px;background:#f6fbf8;padding:1.5rem;text-align:center}
 .formato-icon{font-size:40px;margin-bottom:.5rem}
 .formato-nombre{font-size:15px;font-weight:700;color:#1a6b3a;margin-bottom:.25rem}
 .btn-download{display:inline-flex;align-items:center;gap:7px;padding:12px 24px;background:#1d6f42;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;text-decoration:none;margin-top:.75rem}
 .btn-download:hover{background:#155230}
 .no-formato{font-size:13px;color:#aaa;text-align:center;padding:1.5rem;background:#fafafa;border-radius:10px;border:1px solid #eee}
-
-/* ── VISTA ADMIN ── */
 #vista-admin{max-width:860px;margin:0 auto;padding:2rem 1rem 4rem}
-.admin-header{margin-bottom:2rem}
-.admin-header h1{font-size:22px;font-weight:700;color:#1a1a2e}
-.admin-header p{font-size:14px;color:#777;margin-top:3px}
+.admin-header{margin-bottom:1.25rem}
+.admin-header h1{font-size:22px;font-weight:700;color:var(--color-text-primary)}
+.admin-header p{font-size:14px;color:var(--color-text-secondary);margin-top:3px}
+.header-row{display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:1.5rem}
+.data-btns{display:flex;gap:8px}
+.btn-export{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:#1a1a2e;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer}
+.btn-export:hover{background:#2c2c4a}
+.btn-import-wrap{position:relative}
+.btn-import{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:#fff;color:#1a1a2e;border:1.5px solid #dde1ea;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer}
+.btn-import:hover{background:#f4f5f7}
+#import-file{display:none}
 .tabs{display:flex;gap:4px;background:#e8eaf0;border-radius:10px;padding:4px;margin-bottom:1.5rem;width:fit-content}
 .tab-btn{padding:7px 18px;border:none;background:transparent;border-radius:7px;font-size:13px;font-weight:500;cursor:pointer;color:#666;transition:all .2s}
 .tab-btn.active{background:#fff;color:#1a1a2e;box-shadow:0 1px 4px rgba(0,0,0,.1)}
 .panel{display:none}.panel.active{display:block}
-
-.form-card{background:#fff;border:1px solid #e2e5ed;border-radius:12px;padding:1.25rem;margin-bottom:1rem}
-.form-card h3{font-size:14px;font-weight:600;color:#1a1a2e;margin-bottom:1rem}
+.form-card{background:var(--color-background-primary,#fff);border:1px solid #e2e5ed;border-radius:12px;padding:1.25rem;margin-bottom:1rem}
+.form-card h3{font-size:14px;font-weight:600;color:var(--color-text-primary);margin-bottom:1rem}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
 .field{margin-bottom:0}
-.field label{font-size:12px;font-weight:600;color:#555;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;display:block}
-.field input{width:100%;padding:9px 11px;border:1.5px solid #dde1ea;border-radius:8px;font-size:14px;font-family:inherit;outline:none;background:#fff}
+.field label{font-size:12px;font-weight:600;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;display:block}
+.field input{width:100%;padding:9px 11px;border:1.5px solid #dde1ea;border-radius:8px;font-size:14px;font-family:inherit;outline:none;background:var(--color-background-primary,#fff);color:var(--color-text-primary)}
 .field input:focus{border-color:#1a1a2e}
 .field .hint{font-size:11px;color:#aaa;margin-top:4px}
-
-/* Link Drive */
-
-
 .btn-guardar{padding:10px 22px;background:#1a1a2e;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer}
 .btn-sec{padding:10px 18px;background:#fff;color:#555;border:1.5px solid #dde1ea;border-radius:8px;font-size:14px;cursor:pointer;margin-left:6px}
 .msg-ok{font-size:13px;color:#00b388;font-weight:500;margin-top:8px;display:none}
-
-/* Lista */
-.maq-item{background:#fff;border:1px solid #e2e5ed;border-radius:10px;padding:1rem 1.25rem;display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
-.maq-info p{font-size:15px;font-weight:600;color:#1a1a2e}
+.msg-import{font-size:13px;font-weight:500;margin-top:6px;display:none}
+.maq-item{background:var(--color-background-primary,#fff);border:1px solid #e2e5ed;border-radius:10px;padding:1rem 1.25rem;display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.maq-info p{font-size:15px;font-weight:600;color:var(--color-text-primary)}
 .maq-info small{font-size:12px;color:#999;font-family:monospace}
 .chip{font-size:11px;border-radius:20px;padding:2px 8px;margin-left:6px}
 .chip-ok{background:#eef8f1;border:1px solid #b6e2c8;color:#1d6f42}
@@ -67,11 +65,9 @@ body{font-family:system-ui,sans-serif;background:#f4f5f7;min-height:100vh}
 .btn-ico:hover{background:#f4f5f7}
 .empty-state{text-align:center;padding:3rem 1rem;color:#aaa}
 .empty-state .ico{font-size:36px;margin-bottom:.5rem}
-
-/* QR Grid */
 .qr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
-.qr-card{background:#fff;border:1px solid #e2e5ed;border-radius:12px;padding:1.25rem;text-align:center}
-.qr-card p{font-size:14px;font-weight:600;color:#1a1a2e;margin:10px 0 2px}
+.qr-card{background:var(--color-background-primary,#fff);border:1px solid #e2e5ed;border-radius:12px;padding:1.25rem;text-align:center}
+.qr-card p{font-size:14px;font-weight:600;color:var(--color-text-primary);margin:10px 0 2px}
 .qr-card small{font-size:11px;color:#aaa;font-family:monospace;display:block;margin-bottom:6px}
 .qr-note{font-size:11px;border-radius:6px;padding:3px 8px;display:inline-block;margin-bottom:8px}
 .qr-note.ok{color:#1d6f42;background:#eef8f1}
@@ -79,11 +75,17 @@ body{font-family:system-ui,sans-serif;background:#f4f5f7;min-height:100vh}
 .qr-btns{display:flex;gap:6px;margin-top:8px;justify-content:center}
 .qr-btns button{flex:1;padding:7px 8px;font-size:12px;border:1.5px solid #dde1ea;border-radius:7px;background:#fff;cursor:pointer;font-family:inherit}
 .qr-btns button:hover{background:#f4f5f7}
+.toast{position:fixed;bottom:1.5rem;right:1.5rem;padding:10px 18px;border-radius:10px;font-size:13px;font-weight:600;color:#fff;opacity:0;pointer-events:none;transition:opacity .3s;z-index:9999}
+.toast.show{opacity:1}
+.toast.ok{background:#1d6f42}
+.toast.err{background:#c0392b}
 </style>
 </head>
 <body>
 
-<!-- ══ VISTA FICHA (operador) ══ -->
+<div id="toast" class="toast"></div>
+
+<!-- VISTA FICHA (operador) -->
 <div id="vista-ficha">
   <div class="ficha-header">
     <div class="ficha-badge">Ficha de Máquina</div>
@@ -99,15 +101,24 @@ body{font-family:system-ui,sans-serif;background:#f4f5f7;min-height:100vh}
   </div>
 </div>
 
-<!-- ══ VISTA ADMIN ══ -->
+<!-- VISTA ADMIN -->
 <div id="vista-admin">
-  <div class="admin-header">
-    <h1>Sistema QR · Máquinas</h1>
-    <p>Crea fichas de máquinas y genera sus códigos QR</p>
+  <div class="header-row">
+    <div class="admin-header">
+      <h1>Sistema QR · Máquinas</h1>
+      <p>Crea fichas de máquinas y genera sus códigos QR</p>
+    </div>
+    <div class="data-btns">
+      <button class="btn-export" onclick="exportarJSON()">⬇ Exportar datos</button>
+      <div class="btn-import-wrap">
+        <button class="btn-import" onclick="document.getElementById('import-file').click()">⬆ Importar datos</button>
+        <input type="file" id="import-file" accept=".json" onchange="importarJSON(event)">
+      </div>
+    </div>
   </div>
 
   <div class="tabs">
-    <button class="tab-btn active" onclick="showPanel('crear',this)"> Nueva máquina</button>
+    <button class="tab-btn active" onclick="showPanel('crear',this)">Nueva máquina</button>
     <button class="tab-btn" onclick="showPanel('lista',this)">Máquinas</button>
     <button class="tab-btn" onclick="showPanel('qrs',this)">⬛ Códigos QR</button>
   </div>
@@ -140,23 +151,14 @@ body{font-family:system-ui,sans-serif;background:#f4f5f7;min-height:100vh}
       </div>
       <div class="field" style="margin-top:12px">
         <label>Link de Google Drive</label>
-          <input type="url" id="c-drive-link" placeholder="https://drive.google.com/..." oninput="previewLink()">
+        <input type="url" id="c-drive-link" placeholder="https://drive.google.com/...">
         <p class="hint">Comparte el archivo en Drive con "Cualquiera con el link" y pega la URL aquí.</p>
-      </div>
-      <div class="drive-preview" id="drive-preview" style="display:none">
-        <span class="drive-preview-ico">📄</span>
-        <div class="drive-preview-info">
-          <p id="dp-nombre">—</p>
-          <small>Link de Google Drive listo ✓</small>
-        </div>
-        <button class="drive-clear" onclick="clearLink()" title="Quitar link">×</button>
       </div>
     </div>
 
     <button class="btn-guardar" onclick="guardar()">Guardar máquina</button>
     <button class="btn-sec" onclick="limpiar()">Limpiar</button>
-    <p class="msg-ok" id="msg-
-    ok">✓ Máquina guardada correctamente</p>
+    <p class="msg-ok" id="msg-ok">✓ Máquina guardada correctamente</p>
   </div>
 
   <!-- LISTA -->
@@ -166,7 +168,7 @@ body{font-family:system-ui,sans-serif;background:#f4f5f7;min-height:100vh}
 
   <!-- QRs -->
   <div id="panel-qrs" class="panel">
-    <p style="font-size:13px;color:#777;margin-bottom:1rem">
+    <p style="font-size:13px;color:var(--color-text-secondary);margin-bottom:1rem">
       Al escanear el QR, el operador verá el nombre, serie, línea y podrá descargar el formato desde Google Drive.
     </p>
     <div class="qr-grid" id="qr-wrap"></div>
@@ -174,11 +176,58 @@ body{font-family:system-ui,sans-serif;background:#f4f5f7;min-height:100vh}
 </div>
 
 <script>
-// ── Estado ────────────────────────────────────────────────
 let maquinas = JSON.parse(localStorage.getItem('mq_v4') || '[]');
 let editId = null;
 
 function save(){ localStorage.setItem('mq_v4', JSON.stringify(maquinas)); }
+
+function showToast(msg, tipo='ok'){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + tipo;
+  setTimeout(() => t.className = 'toast', 2800);
+}
+
+// ── Exportar JSON ─────────────────────────────────────────
+function exportarJSON(){
+  if(!maquinas.length){ showToast('No hay máquinas para exportar.','err'); return; }
+  const blob = new Blob([JSON.stringify(maquinas, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'maquinas_backup.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  showToast('✓ maquinas_backup.json descargado');
+}
+
+// ── Importar JSON ─────────────────────────────────────────
+function importarJSON(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev){
+    try{
+      const data = JSON.parse(ev.target.result);
+      if(!Array.isArray(data)) throw new Error('formato inválido');
+      const validos = data.filter(m => m.id && m.nombre && m.serie && m.linea);
+      if(!validos.length) throw new Error('sin registros válidos');
+      const nuevo = validos.filter(m => !maquinas.find(x => x.id === m.id));
+      const reemplazados = validos.filter(m => maquinas.find(x => x.id === m.id));
+      reemplazados.forEach(m => {
+        const idx = maquinas.findIndex(x => x.id === m.id);
+        maquinas[idx] = m;
+      });
+      nuevo.forEach(m => maquinas.push(m));
+      save();
+      showToast(`✓ ${validos.length} máquina(s) importada(s)`);
+      renderLista();
+    } catch(err){
+      showToast('Error al leer el JSON: ' + err.message,'err');
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
 
 // ── Detectar modo ─────────────────────────────────────────
 (function(){
@@ -191,56 +240,21 @@ function save(){ localStorage.setItem('mq_v4', JSON.stringify(maquinas)); }
   }
 })();
 
-// ── Vista Ficha (operador) ────────────────────────────────
+// ── Vista Ficha ───────────────────────────────────────────
 function mostrarFicha(m){
   document.getElementById('vista-ficha').style.display = 'block';
-  if(!m){
-    document.getElementById('f-formato-area').innerHTML = '<p style="color:#c00;text-align:center">QR inválido o expirado.</p>';
-    return;
-  }
+  if(!m){ document.getElementById('f-formato-area').innerHTML = '<p style="color:#c00;text-align:center">QR inválido o expirado.</p>'; return; }
   document.getElementById('f-nombre').textContent = m.nombre;
   document.getElementById('f-serial').textContent  = 'S/N: ' + m.serie;
   document.getElementById('f-linea').textContent   = m.linea;
-
   const area = document.getElementById('f-formato-area');
   if(m.driveLink && m.formatoNombre){
-    area.innerHTML = `
-      <div class="formato-box">
-        <div class="formato-icon">📄</div>
-        <div class="formato-nombre">${m.formatoNombre}</div>
-        <a class="btn-download" href="${m.driveLink}" target="_blank" rel="noopener">
-          ⬇ Descargar / Abrir formato
-        </a>
-      </div>`;
+    area.innerHTML = `<div class="formato-box"><div class="formato-icon">📄</div><div class="formato-nombre">${m.formatoNombre}</div><a class="btn-download" href="${m.driveLink}" target="_blank" rel="noopener">⬇ Descargar / Abrir formato</a></div>`;
   } else if(m.driveLink){
-    area.innerHTML = `
-      <div class="formato-box">
-        <div class="formato-icon">📄</div>
-        <a class="btn-download" href="${m.driveLink}" target="_blank" rel="noopener">
-          ⬇ Descargar / Abrir formato
-        </a>
-      </div>`;
+    area.innerHTML = `<div class="formato-box"><div class="formato-icon">📄</div><a class="btn-download" href="${m.driveLink}" target="_blank" rel="noopener">⬇ Descargar / Abrir formato</a></div>`;
   } else {
     area.innerHTML = '<div class="no-formato">No se asignó ningún formato a esta máquina.</div>';
   }
-}
-
-// ── Preview link Drive ────────────────────────────────────
-function previewLink(){
-  const link = document.getElementById('c-drive-link').value.trim();
-  const nombre = document.getElementById('c-formato-nombre').value.trim();
-  const preview = document.getElementById('drive-preview');
-  if(link.startsWith('https://drive.google.com') || link.startsWith('https://docs.google.com')){
-    document.getElementById('dp-nombre').textContent = nombre || 'Formato sin nombre';
-    preview.style.display = 'flex';
-  } else {
-    preview.style.display = 'none';
-  }
-}
-
-function clearLink(){
-  document.getElementById('c-drive-link').value = '';
-  document.getElementById('drive-preview').style.display = 'none';
 }
 
 // ── Guardar ───────────────────────────────────────────────
@@ -250,39 +264,18 @@ function guardar(){
   const linea         = document.getElementById('c-linea').value.trim();
   const formatoNombre = document.getElementById('c-formato-nombre').value.trim();
   const driveLink     = document.getElementById('c-drive-link').value.trim();
-
-  if(!nombre || !serie || !linea){
-    alert('Completa nombre, número de serie y línea de producción.');
-    return;
-  }
-
-  const m = {
-    id: editId || Date.now(),
-    nombre, serie, linea,
-    formatoNombre: formatoNombre || null,
-    driveLink: driveLink || null
-  };
-
-  if(editId){
-    const idx = maquinas.findIndex(x => x.id === editId);
-    if(idx > -1) maquinas[idx] = m;
-    editId = null;
-  } else {
-    maquinas.push(m);
-  }
-
-  save();
-  limpiar();
+  if(!nombre || !serie || !linea){ alert('Completa nombre, número de serie y línea de producción.'); return; }
+  const m = { id: editId || Date.now(), nombre, serie, linea, formatoNombre: formatoNombre || null, driveLink: driveLink || null };
+  if(editId){ const idx = maquinas.findIndex(x => x.id === editId); if(idx > -1) maquinas[idx] = m; editId = null; }
+  else { maquinas.push(m); }
+  save(); limpiar();
   const msg = document.getElementById('msg-ok');
   msg.style.display = 'block';
   setTimeout(() => msg.style.display = 'none', 2500);
 }
 
 function limpiar(){
-  ['c-nombre','c-serie','c-linea','c-formato-nombre','c-drive-link'].forEach(id => {
-    document.getElementById(id).value = '';
-  });
-  document.getElementById('drive-preview').style.display = 'none';
+  ['c-nombre','c-serie','c-linea','c-formato-nombre','c-drive-link'].forEach(id => document.getElementById(id).value = '');
   editId = null;
 }
 
@@ -299,18 +292,11 @@ function showPanel(id, btn){
 // ── Lista ─────────────────────────────────────────────────
 function renderLista(){
   const el = document.getElementById('lista-wrap');
-  if(!maquinas.length){
-    el.innerHTML = `<div class="empty-state"><div class="ico">🔧</div><p>No hay máquinas registradas aún.</p></div>`;
-    return;
-  }
+  if(!maquinas.length){ el.innerHTML = `<div class="empty-state"><div class="ico">🔧</div><p>No hay máquinas registradas aún.</p></div>`; return; }
   el.innerHTML = maquinas.map(m => `
     <div class="maq-item">
       <div class="maq-info">
-        <p>${m.nombre}
-          ${m.driveLink
-            ? `<span class="chip chip-ok">📄 ${m.formatoNombre || 'Con formato'}</span>`
-            : `<span class="chip chip-no">Sin formato</span>`}
-        </p>
+        <p>${m.nombre}${m.driveLink ? `<span class="chip chip-ok">📄 ${m.formatoNombre||'Con formato'}</span>` : `<span class="chip chip-no">Sin formato</span>`}</p>
         <small>${m.serie} &nbsp;·&nbsp; ${m.linea}</small>
       </div>
       <div class="maq-actions">
@@ -328,7 +314,6 @@ function editarMaquina(id){
   document.getElementById('c-linea').value         = m.linea;
   document.getElementById('c-formato-nombre').value = m.formatoNombre || '';
   document.getElementById('c-drive-link').value    = m.driveLink || '';
-  if(m.driveLink) previewLink();
   editId = id;
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -339,8 +324,7 @@ function editarMaquina(id){
 function eliminar(id){
   if(!confirm('¿Eliminar esta máquina?')) return;
   maquinas = maquinas.filter(x => x.id !== id);
-  save();
-  renderLista();
+  save(); renderLista();
 }
 
 // ── QRs ───────────────────────────────────────────────────
@@ -352,33 +336,20 @@ function buildURL(m){
 
 function renderQRs(){
   const el = document.getElementById('qr-wrap');
-  if(!maquinas.length){
-    el.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="ico">⬛</div><p>Agrega máquinas primero.</p></div>`;
-    return;
-  }
+  if(!maquinas.length){ el.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="ico">⬛</div><p>Agrega máquinas primero.</p></div>`; return; }
   el.innerHTML = maquinas.map(m => `
     <div class="qr-card">
       <div id="qr-${m.id}"></div>
       <p>${m.nombre}</p>
       <small>${m.serie} · ${m.linea}</small>
-      <div>
-        ${m.driveLink
-          ? `<span class="qr-note ok">📄 ${m.formatoNombre || 'Con formato'}</span>`
-          : `<span class="qr-note warn">Sin formato</span>`}
-      </div>
+      <div>${m.driveLink ? `<span class="qr-note ok">📄 ${m.formatoNombre||'Con formato'}</span>` : `<span class="qr-note warn">Sin formato</span>`}</div>
       <div class="qr-btns">
         <button onclick="descargarQR(${m.id},'${m.nombre.replace(/'/g,"\\'")}')">⬇ Descargar</button>
         <button onclick="verFicha(${m.id})">👁 Ver ficha</button>
       </div>
     </div>`).join('');
-
   maquinas.forEach(m => {
-    new QRCode(document.getElementById('qr-' + m.id), {
-      text: buildURL(m),
-      width: 150,
-      height: 150,
-      correctLevel: QRCode.CorrectLevel.M
-    });
+    new QRCode(document.getElementById('qr-' + m.id), { text: buildURL(m), width: 150, height: 150, correctLevel: QRCode.CorrectLevel.M });
   });
 }
 
