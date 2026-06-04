@@ -660,6 +660,10 @@
       <p style="font-size:13px;color:var(--color-text-secondary);margin-bottom:1rem">
         Al escanear el QR, el operador verá el nombre, serie, línea y podrá descargar el formato desde Google Drive.
       </p>
+      <div class="buscador-wrap">
+        <input type="text" id="buscador-qr" placeholder="Buscar por número de serie..." oninput="renderQRs()">
+      </div>
+
       <div class="qr-grid" id="qr-wrap"></div>
     </div>
   </div>
@@ -828,8 +832,10 @@
 
     function renderQRs() {
       const el = document.getElementById('qr-wrap');
-      if (!maquinas.length) { el.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="ico">⬛</div><p>Agrega máquinas primero.</p></div>`; return; }
-      el.innerHTML = maquinas.map(m => `
+      const q = (document.getElementById('buscador-qr')?.value || '').toLowerCase().trim();
+      const lista = q ? maquinas.filter(m => m.serie.toLowerCase().includes(q)) : maquinas;
+      if (!lista.length) { el.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="ico">⬛</div><p>Agrega máquinas primero.</p></div>`; return; }
+      el.innerHTML = lista.map(m => `
     <div class="qr-card">
       <div id="qr-${m.id}"></div>
       <p>${m.nombre}</p>
@@ -840,7 +846,7 @@
         <button onclick="verFicha(${m.id})">👁 Ver ficha</button>
       </div>
     </div>`).join('');
-      maquinas.forEach(m => {
+      lista.forEach(m => {
         new QRCode(document.getElementById('qr-' + m.id), { text: buildURL(m), width: 150, height: 150, correctLevel: QRCode.CorrectLevel.M });
       });
     }
