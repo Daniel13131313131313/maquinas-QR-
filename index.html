@@ -744,7 +744,7 @@
       document.getElementById('f-linea').textContent = m.linea;
       const area = document.getElementById('f-formato-area');
       if (m.driveLink && m.formatoNombre) {
-        area.innerHTML = `<div class="formato-box"><div class="formato-icon">📄</div><div class="formato-nombre">${m.formatoNombre}</div><a class="btn-download" href="${m.driveLink}" target="_blank" rel="noopener">⬇ Descargar / Abrir formato</a><button class="btn-wa" onclick='compartirWA(${JSON.stringify(m)})'> Compartir por WhatsApp</button></div>`;
+        area.innerHTML = `<div class="formato-box"><div class="formato-icon">📄</div><div class="formato-nombre">${m.formatoNombre}</div><a class="btn-download" href="${m.driveLink}" target="_blank" rel="noopener">Abrir Gestor de Archivos CT</a><button class="btn-wa" onclick='compartirWA(${JSON.stringify(m)})'> Compartir por WhatsApp</button></div>`;
       } else if (m.driveLink) {
         area.innerHTML = `<div class="formato-box"><div class="formato-icon">📄</div><a class="btn-download" href="${m.driveLink}" target="_blank" rel="noopener">Abrir Gestor de Archivos CT</a></div>`;
       } else {
