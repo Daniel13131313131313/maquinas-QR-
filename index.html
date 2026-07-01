@@ -683,7 +683,9 @@
 
     // ── Exportar JSON ─────────────────────────────────────────
     function exportarJSON() {
-      if (!maquinas.length) { showToast('No hay máquinas para exportar.', 'err'); return; }
+      if (!maquinas.length) { 
+        showToast('No hay máquinas para exportar.', 'err'); return; 
+      }
       const blob = new Blob([JSON.stringify(maquinas, null, 2)], { type: 'application/json' });
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
@@ -744,7 +746,7 @@
       if (m.driveLink && m.formatoNombre) {
         area.innerHTML = `<div class="formato-box"><div class="formato-icon">📄</div><div class="formato-nombre">${m.formatoNombre}</div><a class="btn-download" href="${m.driveLink}" target="_blank" rel="noopener">⬇ Descargar / Abrir formato</a><button class="btn-wa" onclick='compartirWA(${JSON.stringify(m)})'> Compartir por WhatsApp</button></div>`;
       } else if (m.driveLink) {
-        area.innerHTML = `<div class="formato-box"><div class="formato-icon">📄</div><a class="btn-download" href="${m.driveLink}" target="_blank" rel="noopener">⬇ Descargar / Abrir formato</a></div>`;
+        area.innerHTML = `<div class="formato-box"><div class="formato-icon">📄</div><a class="btn-download" href="${m.driveLink}" target="_blank" rel="noopener">Abrir Gestor de Archivos CT</a></div>`;
       } else {
         area.innerHTML = '<div class="no-formato">No se asignó ningún formato a esta máquina.</div>';
       }
@@ -776,7 +778,7 @@
     function showPanel(id, btn) {
       document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      document.getElementById('panel-' + id).classList.add('active');
+      document.getElementById('panel-' + id).classList.add('active');   
       btn.classList.add('active');
       if (id === 'lista') renderLista();
       if (id === 'qrs') renderQRs();
@@ -859,7 +861,7 @@
       a.href = c.toDataURL();
       a.click();
     }
-
+    
     function verFicha(id) {
       const m = maquinas.find(x => x.id === id);
       if (m) window.open(buildURL(m), '_blank');
@@ -872,6 +874,9 @@
         `\n Formato: *${m.formatoNombre}*` + `\n Link drive del formato: *${m.driveLink}*`;
       window.open('https://wa.me/?text=' + encodeURIComponent(texto), '_blank');
     }
+
+    
+
   </script>
 </body>
 
