@@ -1425,12 +1425,13 @@
         tiempoInput?.focus();
         return;
       }
-      let texto = `Nombre de la máquina: *${m.nombre}*\n` +
+        let texto = `Nombre de la máquina: *${m.nombre}*\n` +
         `Núm. de Serie: *${m.serie}*\n` +
         `Línea: *${m.linea}*\n` +
         `Tiempo de reparación correctiva: *${tiempo} minutos*`;
       if (m.formatoNombre) texto += `\nFormato: *${m.formatoNombre}*`;
-      window.open('https://wa.me/?text=' + encodeURIComponent(texto), '_blank');m.formatoNombre}*`;
+      if (m.driveLink) texto += `\nLink drive del formato: *${m.driveLink}*`;
+      window.open('https://wa.me/?text=' + encodeURIComponent(texto), '_blank');
     }
 
   </script>
