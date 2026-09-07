@@ -147,6 +147,48 @@
       border: 1px solid #eee
     }
 
+    .tiempo-box {
+      border: 2px solid #dde1ea;
+      border-radius: 10px;
+      background: #fff;
+      padding: 1.25rem;
+      margin-top: 1.25rem
+    }
+
+    .tiempo-box .field {
+      margin-bottom: 0
+    }
+
+    .tiempo-box .field label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      margin-bottom: 6px;
+      display: block
+    }
+
+    .tiempo-box .field input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1.5px solid #dde1ea;
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: inherit;
+      outline: none
+    }
+
+    .tiempo-box .field input:focus {
+      border-color: #1a1a2e
+    }
+
+    .tiempo-box .hint {
+      font-size: 11px;
+      color: #aaa;
+      margin-top: 5px
+    }
+
     #vista-admin {
       max-width: 860px;
       margin: 0 auto;
@@ -440,7 +482,44 @@
       border: 1px solid #e2e5ed;
       border-radius: 12px;
       padding: 1.25rem;
-      text-align: center
+      text-align: center;
+      content-visibility: auto;
+      contain-intrinsic-size: auto 280px
+    }
+
+    .qr-slot {
+      width: 150px;
+      height: 150px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center
+    }
+
+    .qr-slot img {
+      display: block;
+      border-radius: 4px
+    }
+
+    .qr-slot.loading {
+      background: #f0f2f5;
+      border-radius: 8px
+    }
+
+    .qr-slot.loading::after {
+      content: '';
+      width: 28px;
+      height: 28px;
+      border: 3px solid #dde1ea;
+      border-top-color: #1a1a2e;
+      border-radius: 50%;
+      animation: qr-spin .7s linear infinite
+    }
+
+    @keyframes qr-spin {
+      to {
+        transform: rotate(360deg)
+      }
     }
 
     .qr-card p {
@@ -498,6 +577,68 @@
       background: #f4f5f7
     }
 
+    .qr-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: .75rem
+    }
+
+    .qr-pager {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap
+    }
+
+    .qr-pager button {
+      padding: 6px 12px;
+      font-size: 12px;
+      border: 1.5px solid #dde1ea;
+      border-radius: 7px;
+      background: #fff;
+      cursor: pointer;
+      font-family: inherit
+    }
+
+    .qr-pager button:hover:not(:disabled) {
+      background: #f4f5f7
+    }
+
+    .qr-pager button:disabled {
+      opacity: .45;
+      cursor: not-allowed
+    }
+
+    .qr-pager span {
+      font-size: 12px;
+      color: #666;
+      padding: 0 4px
+    }
+
+    .qr-cache-bar {
+      height: 3px;
+      background: #e8eaf0;
+      border-radius: 99px;
+      overflow: hidden;
+      margin-bottom: 1rem;
+      display: none
+    }
+
+    .qr-cache-bar.show {
+      display: block
+    }
+
+    .qr-cache-bar i {
+      display: block;
+      height: 100%;
+      background: #00c891;
+      width: 0;
+      transition: width .3s
+    }
+
     .toast {
       position: fixed;
       bottom: 1.5rem;
@@ -528,6 +669,7 @@
     .btn-wa {
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       gap: 7px;
       padding: 12px 24px;
       background: #25d366;
@@ -538,10 +680,23 @@
       font-weight: 600;
       cursor: pointer;
       margin-top: .5rem;
+      width: 100%;
     }
 
     .btn-wa:hover {
       background: #1ebe5d;
+    }
+
+    .btn-wa:disabled {
+      background: #a8e6c3;
+      cursor: not-allowed;
+    }
+
+    .tiempo-error {
+      font-size: 12px;
+      color: #c0392b;
+      margin-top: 6px;
+      display: none;
     }
 
     .buscador-wrap {
@@ -582,6 +737,17 @@
     <div class="ficha-body">
       <div class="section-title">Formato a llenar</div>
       <div id="f-formato-area"></div>
+
+      <div class="tiempo-box">
+        <div class="section-title" style="margin-bottom:.6rem">Reparación correctiva</div>
+        <div class="field">
+          <label>Tiempo de reparación</label>
+          <input type="text" id="f-tiempo-reparacion" placeholder="Ej. 45 min o 1h 20min" oninput="ocultarErrorTiempo()">
+          <p class="hint">Indica cuánto tiempo tomó la reparación antes de compartir por WhatsApp.</p>
+          <p class="tiempo-error" id="tiempo-error">Ingresa el tiempo de reparación antes de compartir.</p>
+        </div>
+        <button class="btn-wa" onclick="compartirWA()">📲 Compartir por WhatsApp</button>
+      </div>
     </div>
 
   </div>
@@ -627,7 +793,7 @@
           <input type="text" id="c-linea">
         </div>
       </div>
-
+      
       <div class="form-card">
         <h3>Formato a llenar (Google Drive)</h3>
         <div class="field">
@@ -649,20 +815,28 @@
     <!-- LISTA -->
     <div id="panel-lista" class="panel">
       <div class="buscador-wrap">
-        <input type="text" id="buscador" placeholder="Buscar por número de serie..." oninput="renderLista()">
+        <input type="text" id="buscador" placeholder="Buscar por número de serie..." oninput="debounceRenderLista()">
       </div>
-      <div id="contador" style="font-size:13px;color:#777;margin-bottom:.75rem"></div>
+      <div class="qr-toolbar">
+        <div id="contador" style="font-size:13px;color:#777"></div>
+        <div class="qr-pager" id="lista-pager"></div>
+      </div>
       <div id="lista-wrap"></div>
     </div>
 
     <!-- QRs -->
     <div id="panel-qrs" class="panel">
       <p style="font-size:13px;color:var(--color-text-secondary);margin-bottom:1rem">
-        Al escanear el QR, el operador verá el nombre, serie, línea y podrá descargar el formato desde Google Drive.
+        Al escanear el QR, el operador verá el nombre, serie, línea, podrá descargar el formato desde Google Drive y capturar el tiempo de reparación correctiva.
       </p>
       <div class="buscador-wrap">
-        <input type="text" id="buscador-qr" placeholder="Buscar por número de serie..." oninput="renderQRs()">
+        <input type="text" id="buscador-qr" placeholder="Buscar por número de serie..." oninput="debounceRenderQRs()">
       </div>
+      <div class="qr-toolbar">
+        <div id="contador-qr" style="font-size:13px;color:#777"></div>
+        <div class="qr-pager" id="qr-pager"></div>
+      </div>
+      <div class="qr-cache-bar" id="qr-cache-bar"><i id="qr-cache-fill"></i></div>
 
       <div class="qr-grid" id="qr-wrap"></div>
     </div>
@@ -671,6 +845,7 @@
   <script>
     let maquinas = JSON.parse(localStorage.getItem('mq_v4') || '[]');
     let editId = null;
+    let currentMachine = null;
 
     function save() { localStorage.setItem('mq_v4', JSON.stringify(maquinas)); }
 
@@ -711,6 +886,7 @@
           reemplazados.forEach(m => {
             const idx = maquinas.findIndex(x => x.id === m.id);
             maquinas[idx] = m;
+            invalidateQRCache(m.id);
           });
           nuevo.forEach(m => maquinas.push(m));
           save();
@@ -738,18 +914,30 @@
     // ── Vista Ficha ───────────────────────────────────────────
     function mostrarFicha(m) {
       document.getElementById('vista-ficha').style.display = 'block';
-      if (!m) { document.getElementById('f-formato-area').innerHTML = '<p style="color:#c00;text-align:center">QR inválido o expirado.</p>'; return; }
+      currentMachine = m;
+      if (!m) {
+        document.getElementById('f-formato-area').innerHTML = '<p style="color:#c00;text-align:center">QR inválido o expirado.</p>';
+        // Sin datos de máquina válidos: ocultamos la sección de tiempo/WhatsApp
+        const tiempoBox = document.querySelector('.tiempo-box');
+        if (tiempoBox) tiempoBox.style.display = 'none';
+        return;
+      }
       document.getElementById('f-nombre').textContent = m.nombre;
       document.getElementById('f-serial').textContent = 'S/N: ' + m.serie;
       document.getElementById('f-linea').textContent = m.linea;
       const area = document.getElementById('f-formato-area');
       if (m.driveLink && m.formatoNombre) {
-        area.innerHTML = `<div class="formato-box"><div class="formato-icon">📄</div><div class="formato-nombre">${m.formatoNombre}</div><a class="btn-download" href="${m.driveLink}" target="_blank" rel="noopener">Abrir Gestor de Archivos CT</a><button class="btn-wa" onclick='compartirWA(${JSON.stringify(m)})'> Compartir por WhatsApp</button></div>`;
+        area.innerHTML = `<div class="formato-box"><div class="formato-icon">📄</div><div class="formato-nombre">${escapeHtml(m.formatoNombre)}</div><a class="btn-download" href="${m.driveLink}" target="_blank" rel="noopener">Abrir Gestor de Archivos CT</a></div>`;
       } else if (m.driveLink) {
         area.innerHTML = `<div class="formato-box"><div class="formato-icon">📄</div><a class="btn-download" href="${m.driveLink}" target="_blank" rel="noopener">Abrir Gestor de Archivos CT</a></div>`;
       } else {
         area.innerHTML = '<div class="no-formato">No se asignó ningún formato a esta máquina.</div>';
       }
+    }
+
+    function ocultarErrorTiempo() {
+      const err = document.getElementById('tiempo-error');
+      if (err) err.style.display = 'none';
     }
 
     // ── Guardar ───────────────────────────────────────────────
@@ -761,8 +949,12 @@
       const driveLink = document.getElementById('c-drive-link').value.trim();
       if (!nombre || !serie || !linea) { alert('Completa nombre, número de serie y línea de producción.'); return; }
       const m = { id: editId || Date.now(), nombre, serie, linea, formatoNombre: formatoNombre || null, driveLink: driveLink || null };
-      if (editId) { const idx = maquinas.findIndex(x => x.id === editId); if (idx > -1) maquinas[idx] = m; editId = null; }
-      else { maquinas.push(m); }
+      if (editId) {
+        const idx = maquinas.findIndex(x => x.id === editId);
+        if (idx > -1) maquinas[idx] = m;
+        invalidateQRCache(editId);
+        editId = null;
+      } else { maquinas.push(m); }
       save(); limpiar();
       const msg = document.getElementById('msg-ok');
       msg.style.display = 'block';
@@ -774,6 +966,14 @@
       editId = null;
     }
 
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
     // ── Tabs ──────────────────────────────────────────────────
     function showPanel(id, btn) {
       document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
@@ -782,20 +982,64 @@
       btn.classList.add('active');
       if (id === 'lista') renderLista();
       if (id === 'qrs') renderQRs();
+      else stopBackgroundQRWarm();
     }
 
     // ── Lista ─────────────────────────────────────────────────
+    let listaPage = 1;
+    let listaSearchTimer = null;
+    const LIST_PAGE_SIZE = 40;
+
+    function renderListaPager(total, page) {
+      const pager = document.getElementById('lista-pager');
+      if (!pager) return;
+      const totalPages = Math.max(1, Math.ceil(total / LIST_PAGE_SIZE));
+      if (total <= LIST_PAGE_SIZE) {
+        pager.innerHTML = '';
+        return;
+      }
+      pager.innerHTML = `
+        <button type="button" ${page <= 1 ? 'disabled' : ''} onclick="setListaPage(${page - 1})">◀ Anterior</button>
+        <span>Pág. ${page} / ${totalPages}</span>
+        <button type="button" ${page >= totalPages ? 'disabled' : ''} onclick="setListaPage(${page + 1})">Siguiente ▶</button>`;
+    }
+
+    function setListaPage(p) {
+      listaPage = Math.max(1, p);
+      renderLista();
+    }
+
+    function debounceRenderLista() {
+      clearTimeout(listaSearchTimer);
+      listaSearchTimer = setTimeout(() => {
+        listaPage = 1;
+        renderLista();
+      }, 280);
+    }
+
     function renderLista() {
-      document.getElementById('contador').textContent = `Total: ${maquinas.length} máquinas registradas`;
       const el = document.getElementById('lista-wrap');
       const q = (document.getElementById('buscador')?.value || '').toLowerCase().trim();
       const lista = q ? maquinas.filter(m => m.serie.toLowerCase().includes(q)) : maquinas;
-      if (!lista.length) { el.innerHTML = `<div class="empty-state"><div class="ico">🔧</div><p>No hay máquinas registradas aún.</p></div>`; return; }
-      el.innerHTML = lista.map(m => `
+      const totalPages = Math.max(1, Math.ceil(lista.length / LIST_PAGE_SIZE));
+      if (listaPage > totalPages) listaPage = totalPages;
+      const start = (listaPage - 1) * LIST_PAGE_SIZE;
+      const pageItems = lista.slice(start, start + LIST_PAGE_SIZE);
+
+      document.getElementById('contador').textContent = lista.length
+        ? `${lista.length} máquina(s) · ${LIST_PAGE_SIZE} por página`
+        : `Total: ${maquinas.length} máquinas registradas`;
+      renderListaPager(lista.length, listaPage);
+
+      if (!lista.length) {
+        el.innerHTML = `<div class="empty-state"><div class="ico">🔧</div><p>${q ? 'No hay coincidencias.' : 'No hay máquinas registradas aún.'}</p></div>`;
+        return;
+      }
+      el.innerHTML = pageItems.map(m => `
     <div class="maq-item">
       <div class="maq-info">
-        <p>${m.nombre}${m.driveLink ? `<span class="chip chip-ok">📄 ${m.formatoNombre || 'Con formato'}</span>` : `<span class="chip chip-no">Sin formato</span>`}</p>
-        <small>${m.serie} &nbsp;·&nbsp; ${m.linea}</small>
+        <p>${escapeHtml(m.nombre)}${m.driveLink ? `<span class="chip chip-ok">📄 ${escapeHtml(m.formatoNombre || 'Con formato')}</span>` : `<span class="chip chip-no">Sin formato</span>`}</p>
+        <small>${escapeHtml(m.serie)} &nbsp;·&nbsp; ${escapeHtml(m.linea)}</small>
       </div>
       <div class="maq-actions">
         <button class="btn-ico" onclick="editarMaquina(${m.id})" title="Editar">✏️</button>
@@ -822,44 +1066,351 @@
     function eliminar(id) {
       if (!confirm('¿Eliminar esta máquina?')) return;
       maquinas = maquinas.filter(x => x.id !== id);
+      invalidateQRCache(id);
       save(); renderLista();
     }
 
     // ── QRs ───────────────────────────────────────────────────
+    const qrCache = new Map();
+    const qrQueue = [];
+    let qrRenderGen = 0;
+    let qrProcessing = false;
+    let qrSearchTimer = null;
+    let qrPage = 1;
+    let bgWarmGen = 0;
+    let qrDbPromise = null;
+    const QR_PAGE_SIZE = 24;
+    const QR_BATCH_SIZE = 3;
+    const QR_DB_NAME = 'mq_qr_cache_v1';
+    const QR_STORE = 'qrs';
+
     function buildURL(m) {
       const data = { nombre: m.nombre, serie: m.serie, linea: m.linea, formatoNombre: m.formatoNombre, driveLink: m.driveLink };
       const base = location.href.split('?')[0];
       return base + '?d=' + encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(data)))));
     }
 
-    function renderQRs() {
-      const el = document.getElementById('qr-wrap');
-      const q = (document.getElementById('buscador-qr')?.value || '').toLowerCase().trim();
-      const lista = q ? maquinas.filter(m => m.serie.toLowerCase().includes(q)) : maquinas;
-      if (!lista.length) { el.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="ico">⬛</div><p>Agrega máquinas primero.</p></div>`; return; }
-      el.innerHTML = lista.map(m => `
-    <div class="qr-card">
-      <div id="qr-${m.id}"></div>
-      <p>${m.nombre}</p>
-      <small>${m.serie} · ${m.linea}</small>
-      <div>${m.driveLink ? `<span class="qr-note ok">📄 ${m.formatoNombre || 'Con formato'}</span>` : `<span class="qr-note warn">Sin formato</span>`}</div>
-      <div class="qr-btns">
-        <button onclick="descargarQR(${m.id},'${m.nombre.replace(/'/g, "\\'")}')">⬇ Descargar</button>
-        <button onclick="verFicha(${m.id})">👁 Ver ficha</button>
-      </div>
-    </div>`).join('');
-      lista.forEach(m => {
-        new QRCode(document.getElementById('qr-' + m.id), { text: buildURL(m), width: 150, height: 150, correctLevel: QRCode.CorrectLevel.M });
+    function getQRKey(m) {
+      return m.id + '|' + buildURL(m);
+    }
+
+    function openQRDB() {
+      if (!qrDbPromise) {
+        qrDbPromise = new Promise((resolve, reject) => {
+          const req = indexedDB.open(QR_DB_NAME, 1);
+          req.onupgradeneeded = () => req.result.createObjectStore(QR_STORE);
+          req.onerror = () => reject(req.error);
+          req.onsuccess = () => resolve(req.result);
+        });
+      }
+      return qrDbPromise;
+    }
+
+    function idbGetQR(key) {
+      return openQRDB().then(db => new Promise((resolve, reject) => {
+        const tx = db.transaction(QR_STORE, 'readonly');
+        const req = tx.objectStore(QR_STORE).get(key);
+        req.onsuccess = () => resolve(req.result || null);
+        req.onerror = () => reject(req.error);
+      })).catch(() => null);
+    }
+
+    function idbSetQR(key, dataUrl) {
+      return openQRDB().then(db => new Promise((resolve, reject) => {
+        const tx = db.transaction(QR_STORE, 'readwrite');
+        tx.objectStore(QR_STORE).put(dataUrl, key);
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
+      })).catch(() => {});
+    }
+
+    function invalidateQRCache(id) {
+      for (const key of qrCache.keys()) {
+        if (key.startsWith(id + '|')) qrCache.delete(key);
+      }
+      openQRDB().then(db => {
+        const tx = db.transaction(QR_STORE, 'readwrite');
+        const store = tx.objectStore(QR_STORE);
+        const req = store.openCursor();
+        req.onsuccess = (e) => {
+          const cursor = e.target.result;
+          if (!cursor) return;
+          if (String(cursor.key).startsWith(id + '|')) cursor.delete();
+          cursor.continue();
+        };
+      }).catch(() => {});
+    }
+
+    function generateQRDataURL(text) {
+      return new Promise(resolve => {
+        try {
+          if (typeof QRCode === 'undefined') {
+            resolve(null);
+            return;
+          }
+          const wrap = document.createElement('div');
+          wrap.style.cssText = 'position:fixed;left:-9999px;top:-9999px;pointer-events:none';
+          document.body.appendChild(wrap);
+          new QRCode(wrap, {
+            text,
+            width: 150,
+            height: 150,
+            correctLevel: QRCode.CorrectLevel.L
+          });
+          const canvas = wrap.querySelector('canvas');
+          const url = canvas ? canvas.toDataURL('image/png') : null;
+          wrap.remove();
+          resolve(url);
+        } catch (e) {
+          resolve(null);
+        }
       });
     }
 
+    function paintQRSlot(slot, m, dataUrl) {
+      slot.classList.remove('loading');
+      slot.innerHTML = `<img src="${dataUrl}" width="150" height="150" alt="QR ${escapeHtml(m.nombre)}" loading="lazy">`;
+      slot.dataset.loaded = '1';
+      slot.dataset.queued = '';
+    }
+
+    async function resolveQRData(m) {
+      const key = getQRKey(m);
+      if (qrCache.has(key)) return qrCache.get(key);
+      const fromDb = await idbGetQR(key);
+      if (fromDb) {
+        qrCache.set(key, fromDb);
+        return fromDb;
+      }
+      const dataUrl = await generateQRDataURL(buildURL(m));
+      if (dataUrl) {
+        qrCache.set(key, dataUrl);
+        idbSetQR(key, dataUrl);
+      }
+      return dataUrl;
+    }
+
+    function enqueueQR(slot, m) {
+      if (slot.dataset.loaded === '1' || slot.dataset.queued === '1') return;
+      slot.dataset.queued = '1';
+      qrQueue.push({ slot, m, gen: qrRenderGen });
+      processQRQueue();
+    }
+
+    async function processQRQueue() {
+      if (qrProcessing || !qrQueue.length) return;
+      qrProcessing = true;
+      const batch = qrQueue.splice(0, QR_BATCH_SIZE);
+      for (const { slot, m, gen } of batch) {
+        if (gen !== qrRenderGen || slot.dataset.loaded === '1') {
+          slot.dataset.queued = '';
+          continue;
+        }
+        try {
+          const dataUrl = await resolveQRData(m);
+          if (gen !== qrRenderGen) {
+            slot.dataset.queued = '';
+            continue;
+          }
+          if (dataUrl) paintQRSlot(slot, m, dataUrl);
+          else {
+            slot.classList.remove('loading');
+            slot.innerHTML = '<span style="color:#c00;font-size:12px">Error QR</span>';
+            slot.dataset.loaded = '1';
+            slot.dataset.queued = '';
+          }
+        } catch (e) {
+          slot.classList.remove('loading');
+          slot.innerHTML = '<span style="color:#c00;font-size:12px">Error QR</span>';
+          slot.dataset.loaded = '1';
+          slot.dataset.queued = '';
+        }
+      }
+      qrProcessing = false;
+      updateCacheProgress();
+      if (qrQueue.length) processQRQueue();
+    }
+
+    function loadPageQRs(pageItems) {
+      pageItems.forEach(m => {
+        const slot = document.getElementById('qr-' + m.id);
+        if (!slot || slot.dataset.loaded === '1') return;
+        const key = getQRKey(m);
+        const cached = qrCache.get(key);
+        if (cached) {
+          paintQRSlot(slot, m, cached);
+          return;
+        }
+        idbGetQR(key).then(dataUrl => {
+          if (slot.dataset.loaded === '1') return;
+          if (dataUrl) {
+            qrCache.set(key, dataUrl);
+            paintQRSlot(slot, m, dataUrl);
+            updateCacheProgress();
+          } else {
+            enqueueQR(slot, m);
+          }
+        });
+      });
+    }
+
+    function stopBackgroundQRWarm() {
+      bgWarmGen++;
+    }
+
+    function updateCacheProgress() {
+      const total = maquinas.length;
+      if (!total) return;
+      const cached = maquinas.filter(m => qrCache.has(getQRKey(m))).length;
+      const bar = document.getElementById('qr-cache-bar');
+      const fill = document.getElementById('qr-cache-fill');
+      if (!bar || !fill) return;
+      if (cached >= total) {
+        bar.classList.remove('show');
+        return;
+      }
+      bar.classList.add('show');
+      fill.style.width = Math.round((cached / total) * 100) + '%';
+    }
+
+    function idleRun(fn) {
+      if (typeof requestIdleCallback === 'function') requestIdleCallback(fn, { timeout: 1500 });
+      else setTimeout(fn, 16);
+    }
+
+    function startBackgroundQRWarm() {
+      stopBackgroundQRWarm();
+      const token = ++bgWarmGen;
+      const pending = maquinas.filter(m => !qrCache.has(getQRKey(m)));
+      if (!pending.length) {
+        updateCacheProgress();
+        return;
+      }
+      updateCacheProgress();
+      let idx = 0;
+      async function warmBatch() {
+        if (token !== bgWarmGen) return;
+        const end = Math.min(idx + 4, pending.length);
+        for (; idx < end; idx++) {
+          if (token !== bgWarmGen) return;
+          await resolveQRData(pending[idx]);
+          updateCacheProgress();
+        }
+        if (idx < pending.length && token === bgWarmGen) {
+          idleRun(() => warmBatch());
+        }
+      }
+      idleRun(() => warmBatch());
+    }
+
+    function renderQRPager(total, page) {
+      const pager = document.getElementById('qr-pager');
+      if (!pager) return;
+      const totalPages = Math.max(1, Math.ceil(total / QR_PAGE_SIZE));
+      if (total <= QR_PAGE_SIZE) {
+        pager.innerHTML = '';
+        return;
+      }
+      pager.innerHTML = `
+        <button type="button" ${page <= 1 ? 'disabled' : ''} onclick="setQRPage(${page - 1})">◀ Anterior</button>
+        <span>Pág. ${page} / ${totalPages}</span>
+        <button type="button" ${page >= totalPages ? 'disabled' : ''} onclick="setQRPage(${page + 1})">Siguiente ▶</button>`;
+    }
+
+    function setQRPage(p) {
+      qrPage = Math.max(1, p);
+      renderQRs();
+    }
+
+    function debounceRenderQRs() {
+      clearTimeout(qrSearchTimer);
+      qrSearchTimer = setTimeout(() => {
+        qrPage = 1;
+        renderQRs();
+      }, 280);
+    }
+
+    function buildQRCard(m) {
+      const cached = qrCache.get(getQRKey(m));
+      const slotClass = cached ? 'qr-slot' : 'qr-slot loading';
+      const slotContent = cached
+        ? `<img src="${cached}" width="150" height="150" alt="QR ${escapeHtml(m.nombre)}" loading="lazy">`
+        : '';
+      const safeNombre = escapeHtml(m.nombre);
+      const safeSerie = escapeHtml(m.serie);
+      const safeLinea = escapeHtml(m.linea);
+      const safeFormato = escapeHtml(m.formatoNombre || 'Con formato');
+      const note = m.driveLink
+        ? `<span class="qr-note ok">📄 ${safeFormato}</span>`
+        : `<span class="qr-note warn">Sin formato</span>`;
+      const btnNombre = m.nombre.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+      const card = document.createElement('div');
+      card.className = 'qr-card';
+      card.innerHTML = `
+      <div id="qr-${m.id}" class="${slotClass}" data-qr-id="${m.id}" data-loaded="${cached ? '1' : ''}">${slotContent}</div>
+      <p>${safeNombre}</p>
+      <small>${safeSerie} · ${safeLinea}</small>
+      <div>${note}</div>
+      <div class="qr-btns">
+        <button onclick="descargarQR(${m.id},'${btnNombre}')">⬇ Descargar</button>
+        <button onclick="verFicha(${m.id})">👁 Ver ficha</button>
+      </div>`;
+      return card;
+    }
+
+    function renderQRs() {
+      ++qrRenderGen;
+      qrQueue.length = 0;
+      const el = document.getElementById('qr-wrap');
+      const q = (document.getElementById('buscador-qr')?.value || '').toLowerCase().trim();
+      const lista = q ? maquinas.filter(m => m.serie.toLowerCase().includes(q)) : maquinas;
+      const contador = document.getElementById('contador-qr');
+      const totalPages = Math.max(1, Math.ceil(lista.length / QR_PAGE_SIZE));
+      if (qrPage > totalPages) qrPage = totalPages;
+      const start = (qrPage - 1) * QR_PAGE_SIZE;
+      const pageItems = lista.slice(start, start + QR_PAGE_SIZE);
+
+      if (contador) {
+        contador.textContent = lista.length
+          ? `${lista.length} máquina(s) · ${QR_PAGE_SIZE} por página`
+          : '';
+      }
+      renderQRPager(lista.length, qrPage);
+
+      if (!lista.length) {
+        stopBackgroundQRWarm();
+        el.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="ico">⬛</div><p>${q ? 'No hay coincidencias.' : 'Agrega máquinas primero.'}</p></div>`;
+        return;
+      }
+
+      const frag = document.createDocumentFragment();
+      pageItems.forEach(m => frag.appendChild(buildQRCard(m)));
+
+      el.replaceChildren(frag);
+      requestAnimationFrame(() => loadPageQRs(pageItems));
+
+      if (!q) startBackgroundQRWarm();
+      else stopBackgroundQRWarm();
+    }
+
     function descargarQR(id, nombre) {
-      const c = document.querySelector('#qr-' + id + ' canvas');
-      if (!c) { alert('Espera a que cargue el QR'); return; }
-      const a = document.createElement('a');
-      a.download = 'QR-' + nombre.replace(/\s+/g, '_') + '.png';
-      a.href = c.toDataURL();
-      a.click();
+      const key = maquinas.find(x => x.id === id);
+      const img = document.querySelector('#qr-' + id + ' img');
+      if (img?.src) {
+        const a = document.createElement('a');
+        a.download = 'QR-' + nombre.replace(/\s+/g, '_') + '.png';
+        a.href = img.src;
+        a.click();
+        return;
+      }
+      if (!key) { alert('Máquina no encontrada'); return; }
+      resolveQRData(key).then(dataUrl => {
+        if (!dataUrl) { alert('No se pudo generar el QR'); return; }
+        const a = document.createElement('a');
+        a.download = 'QR-' + nombre.replace(/\s+/g, '_') + '.png';
+        a.href = dataUrl;
+        a.click();
+      });
     }
     
     function verFicha(id) {
@@ -867,15 +1418,26 @@
       if (m) window.open(buildURL(m), '_blank');
     }
 
-    function compartirWA(m) {
-      const texto = `Nombre de la máquina: *${m.nombre}*\n` +
+    // ── Compartir por WhatsApp (con tiempo de reparación) ──────
+    function compartirWA() {
+      const m = currentMachine;
+      if (!m) return;
+      const tiempoInput = document.getElementById('f-tiempo-reparacion');
+      const tiempo = (tiempoInput?.value || '').trim();
+      if (!tiempo) {
+        const err = document.getElementById('tiempo-error');
+        if (err) err.style.display = 'block';
+        tiempoInput?.focus();
+        return;
+      }
+      let texto = `Nombre de la máquina: *${m.nombre}*\n` +
         `Núm. de Serie: *${m.serie}*\n` +
-        `Línea: *${m.linea}*` +
-        `\n Formato: *${m.formatoNombre}*` + `\n Link drive del formato: *${m.driveLink}*`;
+        `Línea: *${m.linea}*\n` +
+        `Tiempo de reparación correctiva: *${tiempo}*`;
+      if (m.formatoNombre) texto += `\nFormato: *${m.formatoNombre}*`;
+      if (m.driveLink) texto += `\nLink drive del formato: *${m.driveLink}*`;
       window.open('https://wa.me/?text=' + encodeURIComponent(texto), '_blank');
     }
-
-    
 
   </script>
 </body>
