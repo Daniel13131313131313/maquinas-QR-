@@ -742,11 +742,11 @@
         <div class="section-title" style="margin-bottom:.6rem">Reparación correctiva</div>
         <div class="field">
           <label>Tiempo de reparación</label>
-          <input type="text" id="f-tiempo-reparacion" placeholder="Ej. 45 min o 1h 20min" oninput="ocultarErrorTiempo()">
+          <input type="text" id="f-tiempo-reparacion" oninput="ocultarErrorTiempo()">
           <p class="hint">Indica cuánto tiempo tomó la reparación antes de compartir por WhatsApp.</p>
           <p class="tiempo-error" id="tiempo-error">Ingresa el tiempo de reparación antes de compartir.</p>
         </div>
-        <button class="btn-wa" onclick="compartirWA()">📲 Compartir por WhatsApp</button>
+        <button class="btn-wa" onclick="compartirWA()">Compartir por WhatsApp</button>
       </div>
     </div>
 
@@ -799,11 +799,6 @@
         <div class="field">
           <label>Nombre del formato</label>
           <input type="text" id="c-formato-nombre" placeholder="Ej. Checklist de mantenimiento preventivo">
-        </div>
-        <div class="field" style="margin-top:12px">
-          <label>Link de Google Drive</label>
-          <input type="url" id="c-drive-link" placeholder="https://drive.google.com/...">
-          <p class="hint">Comparte el archivo en Drive con "Cualquiera con el link" y pega la URL aquí.</p>
         </div>
       </div>
 
@@ -1433,7 +1428,7 @@
       let texto = `Nombre de la máquina: *${m.nombre}*\n` +
         `Núm. de Serie: *${m.serie}*\n` +
         `Línea: *${m.linea}*\n` +
-        `Tiempo de reparación correctiva: *${tiempo}*`;
+        `Tiempo de reparación correctiva: *${tiempo} minutos*`;
       if (m.formatoNombre) texto += `\nFormato: *${m.formatoNombre}*`;
       if (m.driveLink) texto += `\nLink drive del formato: *${m.driveLink}*`;
       window.open('https://wa.me/?text=' + encodeURIComponent(texto), '_blank');
