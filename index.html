@@ -1430,8 +1430,6 @@
         `Línea: *${m.linea}*\n` +
         `Tiempo de reparación correctiva: *${tiempo} minutos*`;
       if (m.formatoNombre) texto += `\nFormato: *${m.formatoNombre}*`;
-      if (m.driveLink) texto += `\nLink drive del formato: *${m.driveLink}*`;
-      window.open('https://wa.me/?text=' + encodeURIComponent(texto), '_blank');
     }
 
   </script>
