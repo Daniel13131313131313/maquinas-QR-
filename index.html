@@ -762,7 +762,7 @@
         
         <div class="field">
           <label for="f-tiempo-reparacion">Tiempo de reparación (Minutos)</label>
-          <input type="number" id="f-tiempo-reparacion" placeholder="Ej. 45" oninput="ocultarErrorTiempo()">
+          <input type="number" id="f-tiempo-reparacion" oninput="ocultarErrorTiempo()">
           <p class="hint">Indica la duración de la reparación en minutos.</p>
         </div>
 
@@ -1054,10 +1054,10 @@
       err.style.display = 'none';
 
       const msg = `*REPARACIÓN CORRECTIVA*\n` +
-        `*Máquina:* ${currentMachine.nombre}\n` +
+        `*Nombre de máquina:* ${currentMachine.nombre}\n` +
         `🏷 *S/N:* ${currentMachine.serie}\n` +
         `📍 *Línea:* ${currentMachine.linea}\n` +
-        ` *Tiempo de Reparación:* ${tiempoVal} min\n` +
+        ` *Tiempo de Reparación:* ${tiempoVal} minutos\n` +
         ` *Solución:* ${solucionFinal}`;
 
       window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
