@@ -518,13 +518,34 @@
       background: #f4f5f7
     }
 
-    .qr-toolbar {
+    .paginacion {
       display: flex;
+      justify-content: center;
       align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: .75rem
+      gap: 12px;
+      margin-top: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .paginacion button {
+      padding: 8px 16px;
+      border: 1.5px solid #dde1ea;
+      background: #fff;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    .paginacion button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .paginacion span {
+      font-size: 13px;
+      color: #555;
+      font-weight: 600;
     }
 
     .toast {
@@ -715,7 +736,7 @@
     <!-- LISTA -->
     <div id="panel-lista" class="panel">
       <div class="buscador-wrap">
-        <input type="text" id="buscador" placeholder="Buscar por número de serie..." oninput="renderLista()">
+        <input type="text" id="buscador" placeholder="Buscar por número de serie o nombre..." oninput="renderLista()">
       </div>
       <div id="contador" style="font-size:13px;color:#777;margin-bottom:10px"></div>
       <div id="lista-wrap"></div>
@@ -727,9 +748,16 @@
         Al escanear el QR, el operador verá la máquina, podrá abrir el enlace del formato e ingresar el tiempo de reparación y la solución aplicada.
       </p>
       <div class="buscador-wrap">
-        <input type="text" id="buscador-qr" placeholder="Buscar por número de serie..." oninput="renderQRs()">
+        <input type="text" id="buscador-qr" placeholder="Buscar por número de serie o nombre..." oninput="paginaActualQR=1; renderQRs();">
       </div>
       <div class="qr-grid" id="qr-wrap"></div>
+      
+      <!-- Paginador para mantener el rendimiento al cargar 500+ QRs -->
+      <div class="paginacion" id="paginador-qr">
+        <button id="btn-prev-qr" onclick="cambiarPaginaQR(-1)">← Anterior</button>
+        <span id="info-pagina-qr">Página 1</span>
+        <button id="btn-next-qr" onclick="cambiarPaginaQR(1)">Siguiente →</button>
+      </div>
     </div>
   </div>
 
@@ -737,6 +765,10 @@
     let maquinas = JSON.parse(localStorage.getItem('mq_v4') || '[]');
     let editId = null;
     let currentMachine = null;
+
+    // Configuración de Paginación para alto rendimiento
+    const QR_POR_PAGINA = 12;
+    let paginaActualQR = 1;
 
     function save() { localStorage.setItem('mq_v4', JSON.stringify(maquinas)); }
 
@@ -957,17 +989,28 @@
       return base + '?d=' + encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(data)))));
     }
 
+    // ── Renderizado Optimizado de QRs con Paginación ─────────────
     function renderQRs() {
       const wrap = document.getElementById('qr-wrap');
       const q = (document.getElementById('buscador-qr')?.value || '').toLowerCase().trim();
-      const lista = q ? maquinas.filter(m => m.serie.toLowerCase().includes(q) || m.nombre.toLowerCase().includes(q)) : maquinas;
+      const listaFiltrada = q ? maquinas.filter(m => m.serie.toLowerCase().includes(q) || m.nombre.toLowerCase().includes(q)) : maquinas;
 
-      if (!lista.length) {
+      if (!listaFiltrada.length) {
         wrap.innerHTML = '<div class="empty-state" style="grid-column: 1/-1"><p>No hay códigos QR para mostrar.</p></div>';
+        document.getElementById('paginador-qr').style.display = 'none';
         return;
       }
 
-      wrap.innerHTML = lista.map(m => `
+      // Cálculos de Paginación
+      const totalPaginas = Math.ceil(listaFiltrada.length / QR_POR_PAGINA) || 1;
+      if (paginaActualQR > totalPaginas) paginaActualQR = totalPaginas;
+
+      const inicio = (paginaActualQR - 1) * QR_POR_PAGINA;
+      const fin = inicio + QR_POR_PAGINA;
+      const listaPagina = listaFiltrada.slice(inicio, fin);
+
+      // Render de estructura HTML solo para la página actual
+      wrap.innerHTML = listaPagina.map(m => `
         <div class="qr-card">
           <div class="qr-slot" id="qr-slot-${m.id}"></div>
           <p>${escapeHtml(m.nombre)}</p>
@@ -977,8 +1020,8 @@
           </div>
         </div>`).join('');
 
-      // Generar QRs
-      lista.forEach(m => {
+      // Generar únicamente los QR de los elementos visibles
+      listaPagina.forEach(m => {
         const target = document.getElementById(`qr-slot-${m.id}`);
         if (target) {
           target.innerHTML = '';
@@ -990,6 +1033,23 @@
           });
         }
       });
+
+      // Actualizar Controles de Paginación
+      const paginador = document.getElementById('paginador-qr');
+      if (listaFiltrada.length > QR_POR_PAGINA) {
+        paginador.style.display = 'flex';
+        document.getElementById('info-pagina-qr').textContent = `Página ${paginaActualQR} de ${totalPaginas}`;
+        document.getElementById('btn-prev-qr').disabled = (paginaActualQR === 1);
+        document.getElementById('btn-next-qr').disabled = (paginaActualQR === totalPaginas);
+      } else {
+        paginador.style.display = 'none';
+      }
+    }
+
+    function cambiarPaginaQR(delta) {
+      paginaActualQR += delta;
+      renderQRs();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function descargarQR(id) {
