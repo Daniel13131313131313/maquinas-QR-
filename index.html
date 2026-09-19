@@ -770,10 +770,9 @@
           <label for="f-solucion-select">Descripción de la solución</label>
           <select id="f-solucion-select" onchange="evaluarSolucionSelect()">
             <option value="">-- Selecciona una solución --</option>
-            <option value="Ajuste">Ajuste</option>
-            <option value="Sensor óptico">Sensor óptico</option>
-            <option value="Sensor de carrera">Sensor de carrera</option>
-            <option value="Sensor inductivo">Sensor inductivo</option>
+            <option value="Sensor óptico">Ajuste de Sensor óptico</option>
+            <option value="Sensor de carrera">Ajuste de Sensor de carrera</option>
+            <option value="Sensor inductivo">Ajuste de Sensor inductivo</option>
             <option value="Falta de presión de aire">Falta de presión de aire</option>
             <option value="Ajuste de Pines de soldadura">Ajuste de Pines de soldadura</option>
             <option value="Limpieza">Limpieza</option>
@@ -880,7 +879,7 @@
         </div>
       </div>
       <div class="qr-actions-row">
-        <button class="btn-export" onclick="imprimirQRs()">🖨️ Imprimir esta selección</button>
+        <button class="btn-export" onclick="imprimirQRs()">Imprimir esta selección</button>
       </div>
       <div class="qr-grid" id="qr-wrap"></div>
       
@@ -1055,11 +1054,11 @@
       err.style.display = 'none';
 
       const msg = `*REPARACIÓN CORRECTIVA*\n` +
-        `🛠 *Máquina:* ${currentMachine.nombre}\n` +
+        `*Máquina:* ${currentMachine.nombre}\n` +
         `🏷 *S/N:* ${currentMachine.serie}\n` +
         `📍 *Línea:* ${currentMachine.linea}\n` +
-        `⏱ *Tiempo de Reparación:* ${tiempoVal} min\n` +
-        `💡 *Solución:* ${solucionFinal}`;
+        ` *Tiempo de Reparación:* ${tiempoVal} min\n` +
+        ` *Solución:* ${solucionFinal}`;
 
       window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
     }
@@ -1130,8 +1129,8 @@
             <small>${escapeHtml(m.serie)} &nbsp;·&nbsp; ${escapeHtml(m.linea)}</small>
           </div>
           <div class="maq-actions">
-            <button class="btn-ico" onclick="editarMaquina(${m.id})" title="Editar">✏️</button>
-            <button class="btn-ico" onclick="eliminar(${m.id})" title="Eliminar">🗑️</button>
+            <button class="btn-ico" onclick="editarMaquina(${m.id})" title="Editar">EDIT</button>
+            <button class="btn-ico" onclick="eliminar(${m.id})" title="Eliminar">DELETE</button>
           </div>
         </div>`).join('');
     }
