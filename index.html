@@ -617,6 +617,125 @@
       outline: none;
       background: #fff
     }
+
+    .qr-filtros {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 1rem;
+      align-items: end;
+    }
+
+    .qr-filtros select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1.5px solid #dde1ea;
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      background: #fff;
+      color: #1a1a2e
+    }
+
+    .qr-linea-chip {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      color: #16213e;
+      background: #eef1fb;
+      border: 1px solid #cdd6f0;
+      border-radius: 20px;
+      padding: 2px 10px;
+      margin-top: 4px
+    }
+
+    .qr-actions-row {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 1rem
+    }
+
+    #print-area {
+      display: none
+    }
+
+    @media print {
+      body * {
+        visibility: hidden
+      }
+
+      #print-area,
+      #print-area * {
+        visibility: visible
+      }
+
+      #print-area {
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        padding: 12px
+      }
+
+      .print-page-title {
+        text-align: center;
+        font-size: 16px;
+        font-weight: 700;
+        margin-bottom: 14px;
+        color: #000
+      }
+
+      .print-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px
+      }
+
+      .print-card {
+        border: 1px dashed #999;
+        border-radius: 8px;
+        padding: 10px 6px;
+        text-align: center;
+        page-break-inside: avoid;
+        break-inside: avoid
+      }
+
+      .print-card .linea-tag {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+        background: #1a1a2e;
+        color: #fff;
+        border-radius: 20px;
+        padding: 3px 10px;
+        display: inline-block;
+        margin-bottom: 6px
+      }
+
+      .print-card .qr-img-wrap {
+        margin: 4px auto;
+        display: flex;
+        justify-content: center
+      }
+
+      .print-card .nombre {
+        font-size: 13px;
+        font-weight: 700;
+        margin-top: 6px;
+        color: #000
+      }
+
+      .print-card .serie {
+        font-size: 11px;
+        font-family: monospace;
+        color: #333
+      }
+    }
   </style>
 </head>
 
@@ -712,7 +831,8 @@
         </div>
         <div class="field">
           <label>Línea de producción</label>
-          <input type="text" id="c-linea">
+          <input type="text" id="c-linea" list="lineas-datalist" placeholder="Selecciona o escribe una línea">
+          <datalist id="lineas-datalist"></datalist>
         </div>
       </div>
       
@@ -747,8 +867,20 @@
       <p style="font-size:13px;color:#666;margin-bottom:1rem">
         Al escanear el QR, el operador verá la máquina, podrá abrir el enlace del formato e ingresar el tiempo de reparación y la solución aplicada.
       </p>
-      <div class="buscador-wrap">
-        <input type="text" id="buscador-qr" placeholder="Buscar por número de serie o nombre..." oninput="paginaActualQR=1; renderQRs();">
+      <div class="qr-filtros">
+        <div class="field" style="margin-bottom:0;">
+          <label>Filtrar por línea</label>
+          <select id="filtro-linea-qr" onchange="paginaActualQR=1; renderQRs();">
+            <option value="">Todas las líneas</option>
+          </select>
+        </div>
+        <div class="field" style="margin-bottom:0;">
+          <label>Buscar</label>
+          <input type="text" id="buscador-qr" placeholder="Número de serie o nombre..." oninput="paginaActualQR=1; renderQRs();">
+        </div>
+      </div>
+      <div class="qr-actions-row">
+        <button class="btn-export" onclick="imprimirQRs()">🖨️ Imprimir esta selección</button>
       </div>
       <div class="qr-grid" id="qr-wrap"></div>
       
@@ -761,6 +893,9 @@
     </div>
   </div>
 
+  <!-- Área usada solo al imprimir; se llena dinámicamente con la selección actual -->
+  <div id="print-area"></div>
+
   <script>
     let maquinas = JSON.parse(localStorage.getItem('mq_v4') || '[]');
     let editId = null;
@@ -769,6 +904,42 @@
     // Configuración de Paginación para alto rendimiento
     const QR_POR_PAGINA = 12;
     let paginaActualQR = 1;
+
+    // Líneas de producción predefinidas (se usan para el datalist de captura
+    // y para poblar el filtro de la pestaña de Códigos QR)
+    const LINEAS_DISPONIBLES = [
+      "P42RQ CTR",
+      "P42Q LH/RH",
+      "P42R CTR",
+      "P42R LH/RH",
+      "P33A CTR",
+      "P33A LH/RH",
+      "P33A LID CONSOLE",
+      "L02G CTR",
+      "L02G LH/RH",
+      "FIN A",
+      "FIN B",
+      "FORD",
+      "J33A"
+    ];
+
+    function poblarDatalistLineas() {
+      const dl = document.getElementById('lineas-datalist');
+      if (!dl) return;
+      dl.innerHTML = LINEAS_DISPONIBLES.map(l => `<option value="${escapeHtml(l)}">`).join('');
+    }
+
+    function poblarFiltroLineas() {
+      const sel = document.getElementById('filtro-linea-qr');
+      if (!sel) return;
+      const valorPrevio = sel.value;
+      const set = new Set(LINEAS_DISPONIBLES);
+      maquinas.forEach(m => { if (m.linea) set.add(m.linea); });
+      const lineasOrdenadas = Array.from(set).sort((a, b) => a.localeCompare(b));
+      sel.innerHTML = '<option value="">Todas las líneas</option>' +
+        lineasOrdenadas.map(l => `<option value="${escapeHtml(l)}">${escapeHtml(l)}</option>`).join('');
+      if (lineasOrdenadas.includes(valorPrevio)) sel.value = valorPrevio;
+    }
 
     function save() { localStorage.setItem('mq_v4', JSON.stringify(maquinas)); }
 
@@ -822,6 +993,7 @@
         }
       } else {
         document.getElementById('vista-admin').style.display = 'block';
+        poblarDatalistLineas();
       }
     })();
 
@@ -936,7 +1108,7 @@
       document.getElementById('panel-' + id).classList.add('active');   
       btn.classList.add('active');
       if (id === 'lista') renderLista();
-      if (id === 'qrs') renderQRs();
+      if (id === 'qrs') { poblarFiltroLineas(); renderQRs(); }
     }
 
     function renderLista() {
@@ -993,7 +1165,10 @@
     function renderQRs() {
       const wrap = document.getElementById('qr-wrap');
       const q = (document.getElementById('buscador-qr')?.value || '').toLowerCase().trim();
-      const listaFiltrada = q ? maquinas.filter(m => m.serie.toLowerCase().includes(q) || m.nombre.toLowerCase().includes(q)) : maquinas;
+      const lineaSel = document.getElementById('filtro-linea-qr')?.value || '';
+
+      let listaFiltrada = lineaSel ? maquinas.filter(m => m.linea === lineaSel) : maquinas;
+      if (q) listaFiltrada = listaFiltrada.filter(m => m.serie.toLowerCase().includes(q) || m.nombre.toLowerCase().includes(q));
 
       if (!listaFiltrada.length) {
         wrap.innerHTML = '<div class="empty-state" style="grid-column: 1/-1"><p>No hay códigos QR para mostrar.</p></div>';
@@ -1015,6 +1190,7 @@
           <div class="qr-slot" id="qr-slot-${m.id}"></div>
           <p>${escapeHtml(m.nombre)}</p>
           <small>${escapeHtml(m.serie)}</small>
+          <span class="qr-linea-chip">${escapeHtml(m.linea)}</span>
           <div class="qr-btns">
             <button onclick="descargarQR(${m.id})">Descargar QR</button>
           </div>
@@ -1072,6 +1248,58 @@
       a.href = src;
       a.download = `QR_${m.serie}.png`;
       a.click();
+    }
+
+    // ── Impresión de plantilla con varios QR ─────────────────────
+    // Genera una hoja imprimible con TODOS los QR que cumplan el filtro
+    // actual (línea + búsqueda), sin paginar, y con etiquetas grandes de
+    // línea / nombre / número de serie para identificarlos fácilmente
+    // al recortarlos o revisarlos en planta.
+    function imprimirQRs() {
+      const q = (document.getElementById('buscador-qr')?.value || '').toLowerCase().trim();
+      const lineaSel = document.getElementById('filtro-linea-qr')?.value || '';
+
+      let lista = lineaSel ? maquinas.filter(m => m.linea === lineaSel) : maquinas;
+      if (q) lista = lista.filter(m => m.serie.toLowerCase().includes(q) || m.nombre.toLowerCase().includes(q));
+
+      if (!lista.length) {
+        showToast('No hay máquinas para imprimir con este filtro', 'err');
+        return;
+      }
+
+      const printArea = document.getElementById('print-area');
+      const titulo = lineaSel ? `Línea: ${lineaSel}` : 'Todas las líneas';
+      printArea.innerHTML = `<div class="print-page-title">Códigos QR · ${escapeHtml(titulo)} (${lista.length})</div><div class="print-grid" id="print-grid"></div>`;
+      const grid = document.getElementById('print-grid');
+
+      lista.forEach(m => {
+        const card = document.createElement('div');
+        card.className = 'print-card';
+        card.innerHTML = `
+          <div class="linea-tag">${escapeHtml(m.linea)}</div>
+          <div class="qr-img-wrap" id="print-qr-${m.id}"></div>
+          <div class="nombre">${escapeHtml(m.nombre)}</div>
+          <div class="serie">S/N: ${escapeHtml(m.serie)}</div>`;
+        grid.appendChild(card);
+      });
+
+      // Generar los QR dentro de la hoja de impresión (independiente de la
+      // paginación que se usa para navegar en pantalla)
+      lista.forEach(m => {
+        const target = document.getElementById(`print-qr-${m.id}`);
+        if (target) {
+          new QRCode(target, {
+            text: buildURL(m),
+            width: 120,
+            height: 120,
+            correctLevel: QRCode.CorrectLevel.L
+          });
+        }
+      });
+
+      // Pequeña espera para asegurar que todos los QR terminaron de dibujarse
+      // antes de abrir el diálogo de impresión (relevante con lotes grandes)
+      setTimeout(() => { window.print(); }, 300);
     }
   </script>
 </body>
